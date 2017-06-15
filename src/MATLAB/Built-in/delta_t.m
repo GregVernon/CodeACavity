@@ -13,7 +13,7 @@ for jj = 1:NY
     end
 end
 
-dt1 = (h*h) / (4*vMax);
+dt1 = (h^2) / (4*vMax);
 dt2 = (2*vMax) / crMax;
 
 dt = dt1;
