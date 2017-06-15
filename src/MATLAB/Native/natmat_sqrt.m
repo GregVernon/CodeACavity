@@ -13,5 +13,5 @@ end
 err = x * x;
 while err >= tol
     x = x - (x * x - y0) / (2 * x);
-    err = natmat_abs((x * x) - y0);
+    err = natmat_abs((x * x) - y0) / y0;
 end
