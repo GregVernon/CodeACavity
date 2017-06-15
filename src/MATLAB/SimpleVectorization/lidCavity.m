@@ -23,7 +23,7 @@ pIter = 0;
 while t < tmax % start the time integration
     pIter = pIter+1;
     % Compute timestep
-    dt = delta_t(VELOCITY, cREYNOLDS, dt_max, h, NY, NX);
+    dt = delta_t(VELOCITY, cREYNOLDS, dt_max, h);
     % Compute streamfunction
     PSI = computePSI(PSI,OMEGA,h, NY, NX, tol);     
     % Apply vorticity boundary conditions
