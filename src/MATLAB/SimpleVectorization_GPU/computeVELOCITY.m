@@ -1,6 +1,6 @@
 function [U, V, VELOCITY, cREYNOLDS] = computeVELOCITY(PSI, h, NY, NX)
-U = zeros(NY,NX);
-V = zeros(NY,NX);
+U = zeros(NY,NX,'gpuArray');
+V = zeros(NY,NX,'gpuArray');
 
 
 

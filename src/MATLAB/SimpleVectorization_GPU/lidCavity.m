@@ -9,15 +9,15 @@ NX = N;
 Visc=.01;
 tmax = 10;
 dt_max = tmax / 1000;
-tol = 1e-9;
-PSI=zeros(NY,NX);
-OMEGA=zeros(NY,NX);
-U = zeros(NY,NX);
-V = zeros(NY,NX);
-VELOCITY = zeros(NY,NX);
-cREYNOLDS = zeros(NY,NX);
+tol = 1e-5;
+PSI = zeros(NY,NX,'gpuArray');
+OMEGA = zeros(NY,NX,'gpuArray');
+
+
+VELOCITY = zeros(NY,NX,'gpuArray');
+cREYNOLDS = zeros(NY,NX,'gpuArray');
 w=zeros(NY,NX);
-h=1.0/(NY-1);
+h=gpuArray(1.0/(NY-1));
 t=0.0;
 pIter = 0;
 while t < tmax % start the time integration
