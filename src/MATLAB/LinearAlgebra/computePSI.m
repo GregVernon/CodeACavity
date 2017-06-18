@@ -1,9 +1,15 @@
-function PSI = computePSI(PSI, OMEGA, h, NY, NX, tol)
+function PSI = computePSI(PSI, OMEGA, FDM, method,tol, h, NY, NX)
+nx = NX;
+ny = NY;
 jj = 2:NY-1;
 ii = 2:NX-1;
-err = inf;
-while err > tol
-    PSI0=PSI;
-    PSI(jj,ii)=0.25*(PSI(jj+1,ii)+PSI(jj-1,ii)+PSI(jj,ii+1)+PSI(jj,ii-1)+h^2*OMEGA(jj,ii));
-    err = sum(sum(abs(PSI0(jj,ii) - PSI(jj,ii))));
+
+b = computeRHS(PSI,OMEGA,NX,NY,h);
+x0 = reshape(PSI(jj,ii),(ny-2)*(nx-2),1);
+if strcmpi(method,'Direct')
+    x = FDM\b;
+elseif strcmpi(method,'CG')
+    x = conjgrad(FDM, b, x0, tol);
 end
+
+PSI(jj,ii) = reshape(x',ny-2,nx-2);
