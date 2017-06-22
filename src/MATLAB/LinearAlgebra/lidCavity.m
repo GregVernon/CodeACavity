@@ -1,25 +1,20 @@
-%%
-clear
-close all
+function lidCavity(N, tmax, tol, plotFlow)
 
-N = 20;
 NY = N;
 NX = N;
 h=1.0/(NY-1);
 
 Visc=.01;
-tmax = 10;
+
 dt_max = tmax / 1000;
-tol = 1e-9;
+
 PSI=zeros(NY,NX);
 OMEGA=zeros(NY,NX);
 jj = 2:NY-1;
 OMEGA(jj,[NX-1 NX])= -2.0/h;
-U = zeros(NY,NX);
-V = zeros(NY,NX);
+
 VELOCITY = zeros(NY,NX);
 cREYNOLDS = zeros(NY,NX);
-w=zeros(NY,NX);
 
 FDM = assembleCoeffMatrix(NX,NY);
 method = 'cg';
@@ -43,8 +38,10 @@ while t < tmax % start the time integration
     if pIter == 1e3
         pIter = 0;
         disp(['Time: ' num2str(t)])
-        subplot(131), contourf(rot90(fliplr(OMEGA))), axis('square'); colorbar% plot vorticity
-        subplot(132), contourf(rot90(fliplr(PSI))), axis('square'); colorbar% streamfunction
-        subplot(133), quiver(rot90(fliplr(U)),rot90(fliplr(V))), axis('square');axis([1 N 1 N]); drawnow % streamfunction
+        if plotFlow == true
+            subplot(131), contourf(rot90(fliplr(OMEGA))), axis('square'); colorbar% plot vorticity
+            subplot(132), contourf(rot90(fliplr(PSI))), axis('square'); colorbar% streamfunction
+            subplot(133), quiver(rot90(fliplr(U)),rot90(fliplr(V))), axis('square');axis([1 N 1 N]); drawnow % streamfunction
+        end
     end
 end
