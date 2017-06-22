@@ -6,7 +6,7 @@ NX = N;
 Visc=.01;
 
 dt_max = tmax / 1000;
-tol = 1e-9;
+
 PSI=zeros(NY,NX);
 OMEGA=zeros(NY,NX);
 

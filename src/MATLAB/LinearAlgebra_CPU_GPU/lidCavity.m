@@ -2,6 +2,9 @@ function lidCavity(N, tmax, tol, plotFlow)
 
 NY = N;
 NX = N;
+jj = ((2:NY-1)');
+ii = ((2:NX-1));
+
 h=1.0/(NY-1);
 
 Visc=.01;
@@ -10,8 +13,9 @@ dt_max = tmax / 1000;
 
 PSI=gpuArray(zeros(NY,NX));
 OMEGA=gpuArray(zeros(NY,NX));
-jj = 2:NY-1;
-OMEGA(jj,[NX-1 NX])= -2.0/h;
+OMEGA(2:NY-1,[NX-1 NX])= -2.0/h;
+U = zeros(NY,NX,'gpuArray');
+V = zeros(NY,NX,'gpuArray');
 
 VELOCITY = gpuArray(zeros(NY,NX));
 cREYNOLDS = gpuArray(zeros(NY,NX));
@@ -29,9 +33,9 @@ while t < tmax % start the time integration
     % Apply vorticity boundary conditions
     OMEGA = applyBC_OMEGA(PSI, OMEGA, h, NY, NX);
     % Compute vorticity
-    OMEGA = computeOMEGA(PSI, OMEGA, dt, h, NY, NX, Visc);
+    OMEGA(jj,ii) = arrayfun(@computeOMEGA,PSI(jj+1,ii),PSI(jj-1,ii),PSI(jj,ii+1),PSI(jj,ii-1), OMEGA(jj+1,ii), OMEGA(jj-1,ii), OMEGA(jj,ii+1), OMEGA(jj,ii-1), OMEGA(jj,ii), dt, h, Visc);
     % Compute Velocity
-    [U, V, VELOCITY, cREYNOLDS] = computeVELOCITY(PSI, h, NY, NX);
+    [U(jj,ii), V(jj,ii), VELOCITY(jj,ii), cREYNOLDS(jj,ii)] = arrayfun(@computeVELOCITY,PSI(jj+1,ii),PSI(jj-1,ii),PSI(jj,ii+1),PSI(jj,ii-1), h);
     % Increment time value by timestep
     t=t+dt;
     %% plot
