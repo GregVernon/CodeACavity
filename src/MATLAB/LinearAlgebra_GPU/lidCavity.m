@@ -2,6 +2,8 @@ function lidCavity(N, tmax, tol, plotFlow)
 
 NY = N;
 NX = N;
+jj = ((2:NY-1)');
+ii = ((2:NX-1));
 h=1.0/(NY-1);
 
 Visc=.01;
@@ -10,7 +12,6 @@ dt_max = tmax / 1000;
 
 PSI = zeros(NY,NX,'gpuArray');
 OMEGA = zeros(NY,NX,'gpuArray');
-jj = 2:NY-1;
 OMEGA(jj,[NX-1 NX])= -2.0/h;
 U = zeros(NY,NX,'gpuArray');
 V = zeros(NY,NX,'gpuArray');
