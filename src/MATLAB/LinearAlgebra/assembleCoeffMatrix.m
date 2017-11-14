@@ -13,7 +13,8 @@ B = 1; %1;
 T = 1; %1;
 nNodes = (NX-2)*(NY-2);
 for node = 1:nNodes
-    [jj,ii] = ind2sub([NY-2,NX-2],node);
+    jj = rem(node-1, (NY-2)) + 1;
+    ii = (node - jj)/(NY-2) + 1;
     if ii == 1 && jj == 1
         % Bottom Left Node
         % Slower
@@ -23,8 +24,8 @@ for node = 1:nNodes
         
         % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 3];
-        sRow(sIdx) = ones(1,3) * node;
-        sCol(sIdx) = sub2ind([NY-2 NX-2], [jj jj jj+1], [ii ii+1 ii]);
+        sRow(sIdx) = [node node node];
+        sCol(sIdx) = [jj jj jj+1] + ([ii ii+1 ii] - 1).*(NY-2);
         sVal(sIdx) = [C R T];
     elseif ii == NX-2 && jj == 1
         % Bottom Right Node
@@ -35,8 +36,8 @@ for node = 1:nNodes
         
         % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 3];
-        sRow(sIdx) = ones(1,3) * node;
-        sCol(sIdx) = sub2ind([NY-2 NX-2], [jj jj jj+1], [ii ii-1 ii]);
+        sRow(sIdx) = [node node node];
+        sCol(sIdx) = [jj jj jj+1] + ([ii ii-1 ii] - 1).*(NY-2);
         sVal(sIdx) = [C L T];
     elseif ii == 1 && jj == NY-2
         % Top Left Node
@@ -47,8 +48,8 @@ for node = 1:nNodes
         
         % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 3];
-        sRow(sIdx) = ones(1,3) * node;
-        sCol(sIdx) = sub2ind([NY-2 NX-2], [jj jj-1 jj], [ii ii ii+1]);
+        sRow(sIdx) = [node node node];
+        sCol(sIdx) = [jj jj-1 jj] + ([ii ii ii+1] - 1).*(NY-2);
         sVal(sIdx) = [C B R];
     elseif ii == NX-2 && jj == NY-2
         % Top Right Node
@@ -59,8 +60,8 @@ for node = 1:nNodes
         
         % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 3];
-        sRow(sIdx) = ones(1,3) * node;
-        sCol(sIdx) = sub2ind([NY-2 NX-2], [jj jj jj-1], [ii ii-1 ii]);
+        sRow(sIdx) = [node node node];
+        sCol(sIdx) = [jj jj jj-1] + ([ii ii-1 ii] - 1).*(NY-2);
         sVal(sIdx) = [C L B];
     elseif ii == 1
         %             Left Node
@@ -72,8 +73,8 @@ for node = 1:nNodes
         
         % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 4];
-        sRow(sIdx) = ones(1,4) * node;
-        sCol(sIdx) = sub2ind([NY-2 NX-2], [jj jj jj+1 jj-1], [ii ii+1 ii ii]);
+        sRow(sIdx) = [node node node node];
+        sCol(sIdx) = [jj jj jj+1 jj-1] + ([ii ii+1 ii ii] - 1).*(NY-2);
         sVal(sIdx) = [C R T B];
     elseif ii == NX-2
         % Right Node
@@ -85,8 +86,8 @@ for node = 1:nNodes
         
         % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 4];
-        sRow(sIdx) = ones(1,4) * node;
-        sCol(sIdx) = sub2ind([NY-2 NX-2], [jj jj jj+1 jj-1], [ii ii-1 ii ii]);
+        sRow(sIdx) = [node node node node];
+        sCol(sIdx) = [jj jj jj+1 jj-1] + ([ii ii-1 ii ii] - 1).*(NY-2);
         sVal(sIdx) = [C L T B];
     elseif jj == 1
         % Bottom Node
@@ -98,8 +99,8 @@ for node = 1:nNodes
         
         % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 4];
-        sRow(sIdx) = ones(1,4) * node;
-        sCol(sIdx) = sub2ind([NY-2 NX-2], [jj jj+1 jj jj], [ii ii ii-1 ii+1]);
+        sRow(sIdx) = [node node node node];
+        sCol(sIdx) = [jj jj+1 jj jj] + ([ii ii ii-1 ii+1] - 1).*(NY-2);
         sVal(sIdx) = [C T L R];
     elseif jj == NY-2
         % Top Node
@@ -111,8 +112,8 @@ for node = 1:nNodes
         
         % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 4];
-        sRow(sIdx) = ones(1,4) * node;
-        sCol(sIdx) = sub2ind([NY-2 NX-2], [jj jj-1 jj jj], [ii ii ii+1 ii-1]);
+        sRow(sIdx) = [node node node node];
+        sCol(sIdx) = [jj jj-1 jj jj] + ([ii ii ii+1 ii-1] - 1).*(NY-2);
         sVal(sIdx) = [C B R L];
     else
         % Interior Node
@@ -125,8 +126,8 @@ for node = 1:nNodes
         
         %Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 5];
-        sRow(sIdx) = ones(1,5) * node;
-        sCol(sIdx) = sub2ind([NY-2 NX-2], [jj jj jj jj+1 jj-1], [ii ii+1 ii-1 ii ii]);
+        sRow(sIdx) = [node node node node node];
+        sCol(sIdx) = [jj jj jj jj+1 jj-1] + ([ii ii+1 ii-1 ii ii] - 1).*(NY-2); 
         sVal(sIdx) = [C R L T B];
 
     end
