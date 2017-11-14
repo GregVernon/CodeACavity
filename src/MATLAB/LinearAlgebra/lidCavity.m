@@ -1,4 +1,4 @@
-function lidCavity(N, tmax, tol, plotFlow)
+function lidCavity(N, tmax, method, tol, max_tstep, plotFlow)
 
 NY = N;
 NX = N;
@@ -6,7 +6,7 @@ h=1.0/(NY-1);
 
 Visc=.01;
 
-dt_max = tmax / 1000;
+dt_max = tmax / 10000;
 
 PSI=zeros(NY,NX);
 OMEGA=zeros(NY,NX);
@@ -17,11 +17,18 @@ VELOCITY = zeros(NY,NX);
 cREYNOLDS = zeros(NY,NX);
 
 FDM = assembleCoeffMatrix(NX,NY);
-method = 'cg';
+
+if strcmpi(method,'Decomposition')
+    FDM = decomposition(FDM);
+end
+
+tic;
 t=0.0;
 pIter = 0;
-while t < tmax % start the time integration
+tstep = 0;
+while t < tmax && tstep < max_tstep% start the time integration
     pIter = pIter+1;
+    tstep = tstep + 1;
     % Compute timestep
     dt = delta_t(VELOCITY, cREYNOLDS, dt_max, h);
     % Compute streamfunction
