@@ -17,119 +17,58 @@ for node = 1:nNodes
     ii = (node - jj)/(NY-2) + 1;
     if ii == 1 && jj == 1
         % Bottom Left Node
-        % Slower
-        %         Stencil(jj,ii) = C;     %-4;
-        %         Stencil(jj,ii+1) = R;   %1;
-        %         Stencil(jj+1,ii) = T;   %1;
-        
-        % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 3];
         sRow(sIdx) = [node node node];
         sCol(sIdx) = [jj jj jj+1] + ([ii ii+1 ii] - 1).*(NY-2);
         sVal(sIdx) = [C R T];
     elseif ii == NX-2 && jj == 1
         % Bottom Right Node
-        % Slower
-        %         Stencil(jj,ii) = C;     %-4;
-        %         Stencil(jj,ii-1) = L;   %1;
-        %         Stencil(jj+1,ii) = T;   %1;
-        
-        % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 3];
         sRow(sIdx) = [node node node];
         sCol(sIdx) = [jj jj jj+1] + ([ii ii-1 ii] - 1).*(NY-2);
         sVal(sIdx) = [C L T];
     elseif ii == 1 && jj == NY-2
         % Top Left Node
-        % Slower
-        %         Stencil(jj,ii) = C;     %-4;
-        %         Stencil(jj-1,ii) = B;   %1;
-        %         Stencil(jj,ii+1) = R;   %1;
-        
-        % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 3];
         sRow(sIdx) = [node node node];
         sCol(sIdx) = [jj jj-1 jj] + ([ii ii ii+1] - 1).*(NY-2);
         sVal(sIdx) = [C B R];
     elseif ii == NX-2 && jj == NY-2
         % Top Right Node
-        % Slower
-        %         Stencil(jj,ii) = C;     %-4;
-        %         Stencil(jj,ii-1) = L;   %1;
-        %         Stencil(jj-1,ii) = B;   %1;
-        
-        % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 3];
         sRow(sIdx) = [node node node];
         sCol(sIdx) = [jj jj jj-1] + ([ii ii-1 ii] - 1).*(NY-2);
         sVal(sIdx) = [C L B];
     elseif ii == 1
-        %             Left Node
-        % Slower
-        %         Stencil(jj,ii) = C;     %-4;
-        %         Stencil(jj,ii+1) = R;   %1;
-        %         Stencil(jj+1,ii) = T;   %1;
-        %         Stencil(jj-1,ii) = B;   %1;
-        
-        % Faster
+        % Left Node
         sIdx = [sIdx(end) + 1 : sIdx(end) + 4];
         sRow(sIdx) = [node node node node];
         sCol(sIdx) = [jj jj jj+1 jj-1] + ([ii ii+1 ii ii] - 1).*(NY-2);
         sVal(sIdx) = [C R T B];
     elseif ii == NX-2
         % Right Node
-        % Slower
-        %         Stencil(jj,ii) = C;     %-4;
-        %         Stencil(jj,ii-1) = L;   %1;
-        %         Stencil(jj+1,ii) = T;   %1;
-        %         Stencil(jj-1,ii) = B;   %1;
-        
-        % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 4];
         sRow(sIdx) = [node node node node];
         sCol(sIdx) = [jj jj jj+1 jj-1] + ([ii ii-1 ii ii] - 1).*(NY-2);
         sVal(sIdx) = [C L T B];
     elseif jj == 1
         % Bottom Node
-        % Slower
-        %         Stencil(jj,ii) = C;     %-4;
-        %         Stencil(jj+1,ii) = T;   %1;
-        %         Stencil(jj,ii-1) = L;   %1;
-        %         Stencil(jj,ii+1) = R;   %1;
-        
-        % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 4];
         sRow(sIdx) = [node node node node];
         sCol(sIdx) = [jj jj+1 jj jj] + ([ii ii ii-1 ii+1] - 1).*(NY-2);
         sVal(sIdx) = [C T L R];
     elseif jj == NY-2
         % Top Node
-        % Slower
-        %         Stencil(jj,ii) = C;     %-4;
-        %         Stencil(jj-1,ii) = B;   %1;
-        %         Stencil(jj,ii+1) = R;   %1;
-        %         Stencil(jj,ii-1) = L;   %1;
-        
-        % Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 4];
         sRow(sIdx) = [node node node node];
         sCol(sIdx) = [jj jj-1 jj jj] + ([ii ii ii+1 ii-1] - 1).*(NY-2);
         sVal(sIdx) = [C B R L];
     else
         % Interior Node
-        %         %Slower
-        %         Stencil(jj,ii) = C;     %-4;
-        %         Stencil(jj,ii+1) = R;   %1;
-        %         Stencil(jj,ii-1) = L;   %1;
-        %         Stencil(jj+1,ii) = T;   %1;
-        %         Stencil(jj-1,ii) = B;   %1;
-        
-        %Faster
         sIdx = [sIdx(end) + 1 : sIdx(end) + 5];
         sRow(sIdx) = [node node node node node];
         sCol(sIdx) = [jj jj jj jj+1 jj-1] + ([ii ii+1 ii-1 ii ii] - 1).*(NY-2); 
         sVal(sIdx) = [C R L T B];
-
     end
 end
 
