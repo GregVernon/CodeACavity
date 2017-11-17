@@ -1,4 +1,5 @@
 function w = computeJacRelaxFactors(FDM)
+% Do not recommend doing for FDM > 4x4
 D = eye(size(FDM)) .* diag(FDM,0);
 R = triu(FDM,1) + tril(FDM,-1);
 b = zeros(size(FDM,1),1);
