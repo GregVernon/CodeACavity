@@ -8,3 +8,7 @@ dt1 = (h^2) / (4*vMax);
 dt2 = (2*vMax) / crMax;
 
 dt = min([dt1 dt2 dt_max]);
+
+if isinf(dt)
+    dt = 2*eps;
+end
