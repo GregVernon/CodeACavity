@@ -1,9 +1,9 @@
-function computeRelaxFactors(FDM)
+function computeJacRelaxFactors(FDM)
 D = eye(size(FDM)) .* diag(FDM,0);
 R = triu(FDM,1) + tril(FDM,-1);
 b = zeros(size(FDM,1),1);
 
-J = inv(D)*b - inv(D)*R;
+J = D\b - D\R;
 
 W = sym('w',[3 1]);
 
