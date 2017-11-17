@@ -1,15 +1,10 @@
-A = [-2 1 0; 1 -2 1; 0 1 -2];
-D = eye(size(A)) .* diag(A,0);
-R = triu(A,1) + tril(A,-1);
-b = zeros(size(A,1),1);
+function computeRelaxFactors(FDM)
+D = eye(size(FDM)) .* diag(FDM,0);
+R = triu(FDM,1) + tril(FDM,-1);
+b = zeros(size(FDM,1),1);
 
 J = inv(D)*b - inv(D)*R;
 
-syms w
-
-W(1) = 2 + sqrt(2);
-W(2) = 1;
-W(3) = 2 - sqrt(2);
 W = sym('w',[3 1]);
 
 for ii = 1:3
