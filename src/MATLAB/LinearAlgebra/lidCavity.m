@@ -20,6 +20,13 @@ FDM = assembleCoeffMatrix(NX,NY);
 
 if strcmpi(method,'Decomposition')
     FDM = decomposition(FDM);
+elseif strcmpi(method,'Jacobi')
+    A = FDM;
+    clearvars FDM
+    FDM.A = A;
+    FDM.D = speye(size(A)) .* spdiags(A,0);
+    FDM.R = triu(A,1) + tril(A,-1);
+    FDM.iD = inv(FDM.D);
 end
 
 tic;

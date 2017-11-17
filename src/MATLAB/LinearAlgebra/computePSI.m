@@ -12,6 +12,8 @@ elseif strcmpi(method,'CG')
     x = conjgrad(FDM, b, x0, tol);
 elseif strcmpi(method,'Decomposition')
     x = FDM \ b;
+elseif strcmpi(method,'Jacobi')
+    x = jacobi(FDM,b,tol,x0);
 end
 
 PSI(jj,ii) = reshape(x',ny-2,nx-2);
