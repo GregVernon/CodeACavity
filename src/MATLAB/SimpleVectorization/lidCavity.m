@@ -1,5 +1,4 @@
-function lidCavity(N, tmax, tol, plotFlow)
-
+function lidCavity(N, tmax, method, tol, max_tstep, plotFlow)
 NY = N;
 NX = N;
 
@@ -16,12 +15,14 @@ cREYNOLDS = zeros(NY,NX);
 h=1.0/(NY-1);
 t=0.0;
 pIter = 0;
-while t < tmax % start the time integration
+tstep = 0;
+while t < tmax && tstep < max_tstep% start the time integration
+    tstep = tstep + 1;
     pIter = pIter+1;
     % Compute timestep
     dt = delta_t(VELOCITY, cREYNOLDS, dt_max, h);
     % Compute streamfunction
-    PSI = computePSI(PSI,OMEGA,h, NY, NX, tol);
+    PSI = computePSI(PSI, OMEGA, h, NY, NX, method, tol);
     % Apply vorticity boundary conditions
     OMEGA = applyBC_OMEGA(PSI, OMEGA, h, NY, NX);
     % Compute vorticity
@@ -31,7 +32,7 @@ while t < tmax % start the time integration
     % Increment time value by timestep
     t=t+dt;
     %% plot
-    if pIter == 1e2
+    if pIter == -1
         pIter = 0;
         disp(['Time: ' num2str(t)])
         if plotFlow == true
