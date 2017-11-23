@@ -1,55 +1,52 @@
-function b = computeRHS(PSI,OMEGA,NX,NY,h)
-%% Generate b for a domain from 2:N-1
+function b = computeRHS(PSI,OMEGA,U,NX,NY,h)
+dx = h;
+dy = h;
+%% Preallocate b
 b = zeros(NX*NY,1);
 %% Bottom Left Node
-jj = 2;
-ii = 2;
+jj = 1;
+ii = 1;
 bidx = sub2ind([NY,NX],jj,ii);
-b(bidx) = -(h^2 *  OMEGA(jj,ii)) + (PSI(jj,ii-1) + PSI(jj-1,ii));
+b(bidx) = 0;
 %% Bottom Right Node
-jj = 2;
-ii = NX-1;
+jj = 1;
+ii = NX;
 bidx = sub2ind([NY,NX],jj,ii);
-b(bidx) = -(h^2 *  OMEGA(jj,ii)) + (PSI(jj,ii+1) - PSI(jj-1,ii));
+b(bidx) = 0;
 %% Top Left Node
-jj = NY-1;
-ii = 2;
+jj = NY;
+ii = 1;
 bidx = sub2ind([NY,NX],jj,ii);
-b(bidx) = -(h^2 *  OMEGA(jj,ii)) - (PSI(jj+1,ii) + PSI(jj,ii-1));
+b(bidx) = 2*dy * U(jj,ii);
 %% Top Right Node
-jj = NY-1; 
-ii = NX-1;
+jj = NY;
+ii = NX;
 bidx = sub2ind([NY,NX],jj,ii);
-b(bidx) = -(h^2 *  OMEGA(jj,ii)) - (PSI(jj+1,ii) + PSI(jj,ii+1));
+b(bidx) = 2*dy * U(jj,ii);
 %% Left Node
-jj = 2:NY-1;
-ii = 2;
+jj = 1:NY;
+ii = 1;
 bidx = sub2ind([NY,NX],jj,ii*ones(size(jj)));
-b(bidx) = -(h^2 *  OMEGA(jj,ii)) - (PSI(jj,ii-1));
+b(bidx) = 0;
 %% Right Node
-jj = 2:NY-1;
-ii = NX-1;
+jj = 1:NY;
+ii = NX;
 bidx = sub2ind([NY,NX],jj,ii*ones(size(jj)));
-b(bidx) = -(h^2 *  OMEGA(jj,ii)) - (PSI(jj,ii+1));
+b(bidx) = 0;
 %% Bottom Node
-jj = 2;
-ii = 2:NX-1; 
+jj = 1;
+ii = 1:NX;
 bidx = sub2ind([NY,NX],jj*ones(size(ii)),ii);
-b(bidx) = -(h^2 *  OMEGA(jj,ii)) - (PSI(jj-1,ii));
+b(bidx) = 0;
 %% Top Node
-jj = NY-1;
-ii = 2:NX-1;
+jj = NY;
+ii = 1:NX;
 bidx = sub2ind([NY,NX],jj*ones(size(ii)),ii);
-b(bidx) = -(h^2 *  OMEGA(jj,ii)) - (PSI(jj+1,ii));
+b(bidx) = 2*dy * U(jj,ii);
 %% Interior Node
-jj = 3:NY-2;
-ii = 3:NX-2;
-JJ = reshape(repmat([3:NY-2]',1,NX-4),(NY-4)*(NX-4),1);
-II = reshape(repmat(3:NX-2,NY-4,1),(NY-4)*(NX-4),1);
+jj = 2:NY-1;
+ii = 2:NX-1;
+JJ = reshape(repmat(jj',1,NX-2),(NY-2)*(NX-2),1);
+II = reshape(repmat(ii, NY-2,1),(NY-2)*(NX-2),1);
 bidx = sub2ind([NY,NX],JJ,II);
-b(bidx) = -(h^2 * OMEGA(jj,ii));
-%% Remove Boundary Nodes from RHS vector
-jj = [[1:NY] [1:NY] [1*ones(1,NX)] [NY*ones(1,NX)]];
-ii = [[1*ones(1,NY)] [NX*ones(1,NY)] [1:NX] [1:NX]];
-bidx = sub2ind([NY,NX],jj,ii);
-b(bidx) = [];
+b(bidx) = -(dx^2*dy^2 * OMEGA(jj,ii));
