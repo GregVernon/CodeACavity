@@ -1,7 +1,9 @@
-function PSI = computePSI(PSI, OMEGA, FDM, method, tol, h, NY, NX)
+function PSI = computePSI(PSI, OMEGA, FDM, method, tol, dx, dy, NX, NY)
+ii = 1:NX;
+jj = 1:NY;
 
-b = computeRHS(PSI,OMEGA,NX,NY,h);
-x0 = reshape(PSI,NX*NY,1);
+b = computeRHS(PSI,OMEGA,NX,NY,dx,dy);
+x0 = reshape(PSI(jj,ii),(NX)*(NY),1);
 if strcmpi(method,'Direct')
     x = FDM \ b;
 elseif strcmpi(method,'CG')
@@ -12,4 +14,4 @@ elseif strcmpi(method,'Jacobi')
     x = jacobi(FDM,b,tol,x0);
 end
 
-PSI = reshape(x',NY,NX);
+PSI(jj,ii) = reshape(x',NY,NX);
