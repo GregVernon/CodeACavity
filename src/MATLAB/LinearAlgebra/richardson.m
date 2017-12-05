@@ -8,8 +8,6 @@ iD = FDM.iD;
 
 err = inf;
 while err > tol
-%     x = x + weight*f;
-%     f = b - FDM*x;
     x = x - weight*(iD*(A*x - b));
     res = b - A*x;
     err = norm(res);

@@ -12,6 +12,12 @@ elseif strcmpi(method,'Decomposition')
     x = FDM \ b;
 elseif strcmpi(method,'Jacobi')
     x = jacobi(FDM,b,tol,x0);
+elseif strcmpi(method,'Weighted Jacobi')
+    x = weighted_jacobi(FDM,b,tol,x0);
+elseif strcmpi(method,'Richardson')
+    x = richardson(FDM,b,tol,x0);
+elseif strcmpi(method,'AlternatingAndersonRichardson')
+    x = anderson(FDM,b,tol,x0);
 end
 
 PSI(jj,ii) = reshape(x',NY,NX);

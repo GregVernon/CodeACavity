@@ -7,7 +7,7 @@ xmin = 0;
 xmax = 1;
 x = linspace(xmin,xmax,NX);
 ymin = 0;
-ymax = .1;
+ymax = 1;
 y = linspace(ymin,ymax,NY);
 [xx,yy] = meshgrid(x,y);
 
@@ -29,9 +29,10 @@ cREYNOLDS = zeros(NY,NX);
 
 FDM = assembleCoeffMatrix(dx, dy, NX,NY);
 
+fixedPointMethods = {'Jacobi','Weighted Jacobi','Richardson','AlternatingAnderson'};
 if strcmpi(method,'Decomposition')
     FDM = decomposition(FDM);
-elseif strcmpi(method,'Jacobi')
+elseif ismember(fixedPointMethods,method)
     A = FDM;
     clearvars FDM
     FDM.A = A;
@@ -61,7 +62,7 @@ while t < tmax && tstep < max_tstep% start the time integration
     % Increment time value by timestep
     t=t+dt;
     %% plot
-    if pIter == 1e1
+    if pIter == 1e2
         pIter = 0;
         disp(['Time: ' num2str(t)])
         if plotFlow == true

@@ -4,15 +4,13 @@ A = FDM.A;
 iD = FDM.iD;
 R = FDM.R;
 
-weight = 1.1;
+weight = 2/3;
 x = x0;
 err = inf;
 iter = 0;
 while err > tol
     iter = iter + 1;
-    g = iD * (b - R*x);
-    f = g - x;
-    x = x + weight*f;
+    x = weight*iD * (b - R*x) + (1-weight)*x;
     res = b - A*x;
     err = norm(res);
 end
