@@ -29,10 +29,10 @@ cREYNOLDS = zeros(NY,NX);
 
 FDM = assembleCoeffMatrix(dx, dy, NX,NY);
 
-fixedPointMethods = {'Jacobi','Weighted Jacobi','Richardson','AlternatingAnderson'};
+fixedPointMethods = {'Jacobi','Weighted Jacobi','Mapped Jacobi','Richardson','Mapped Richardson','AlternatingAnderson'};
 if strcmpi(method,'Decomposition')
     FDM = decomposition(FDM);
-elseif ismember(fixedPointMethods,method)
+elseif any(ismember(fixedPointMethods,method))
     A = FDM;
     clearvars FDM
     FDM.A = A;
