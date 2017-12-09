@@ -21,7 +21,7 @@ elseif strcmpi(method,'Richardson')
 elseif strcmpi(method,'Mapped Richardson')
     x = richardson_Mapped(FDM,b,tol,x0,dx,dy,NX,NY);
 elseif strcmpi(method,'AlternatingAndersonRichardson')
-    x = anderson(FDM,b,tol,x0);
+    x = AlternatingAndersonRichardson(FDM,b,tol,x0);
 end
 
 PSI(jj,ii) = reshape(x',NY,NX);
