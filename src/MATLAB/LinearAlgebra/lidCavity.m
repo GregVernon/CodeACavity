@@ -29,14 +29,18 @@ cREYNOLDS = zeros(NY,NX);
 
 FDM = assembleCoeffMatrix(dx, dy, NX,NY);
 
-fixedPointMethods = {'Jacobi','Weighted Jacobi','Mapped Jacobi','Richardson','Mapped Richardson','AlternatingAnderson'};
+fixedPointMethods = {'Jacobi','Weighted Jacobi','Mapped Jacobi','Richardson','Mapped Richardson','AlternatingAndersonRichardson'};
 if strcmpi(method,'Decomposition')
     FDM = decomposition(FDM);
 elseif any(ismember(fixedPointMethods,method))
     A = FDM;
     clearvars FDM
     FDM.A = A;
-    FDM.D = speye(size(A)) .* spdiags(A,0);
+    dVal = spdiags(A,0);
+    I = speye(size(A));
+    [iRow,iCol] = find(I);
+    D = sparse(iCol,iRow,dVal,size(A,1),size(A,2));
+    FDM.D = D;
     FDM.R = triu(A,1) + tril(A,-1);
     FDM.iD = inv(FDM.D);
 end
