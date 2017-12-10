@@ -73,14 +73,14 @@ while t < tmax && tstep < max_tstep% start the time integration
                 [~,pltOMEGA]=contourf(xx,yy,OMEGA); 
                 axis('square'); 
                 colormap(jet);
-                caxis([-max(abs(OMEGA(:))) max(abs(OMEGA(:)))]); 
+                caxis([-gather(max(abs(OMEGA(:)))) gather(max(abs(OMEGA(:))))]); 
                 colorbar('southoutside')% plot vorticity
                 
                 subplot(132);
                 [~,pltPSI]=contourf(xx,yy,PSI); 
                 axis('square'); 
                 colormap(jet);
-                caxis([-max(abs(PSI(:))) max(abs(PSI(:)))]);
+                caxis([-gather(max(abs(PSI(:)))) gather(max(abs(PSI(:))))]);
                 colorbar('southoutside')% streamfunction
                 
                 subplot(133);
@@ -89,12 +89,13 @@ while t < tmax && tstep < max_tstep% start the time integration
                 [~,conVEL]=contour(xx,yy,VELOCITY);
                 axis('square'); 
                 axis([xmin xmax ymin ymax]);
+                caxis([-gather(max(abs(VELOCITY(:)))) gather(max(abs(VELOCITY(:))))]);
                 colorbar('southoutside')
                 drawnow % streamfunction
             else
-                pltOMEGA.ZData=OMEGA;
-                pltPSI.ZData=PSI;
-                pltVEL.UData=U; pltVEL.VData=V; conVEL.ZData=VELOCITY; drawnow
+                pltOMEGA.ZData=gather(OMEGA); caxis([-gather(max(abs(OMEGA(:)))) gather(max(abs(OMEGA(:))))]); 
+                pltPSI.ZData=gather(PSI); caxis([-gather(max(abs(PSI(:)))) gather(max(abs(PSI(:))))]);
+                pltVEL.UData=gather(U); pltVEL.VData=gather(V); conVEL.ZData=gather(VELOCITY); caxis([-gather(max(abs(VELOCITY(:)))) gather(max(abs(VELOCITY(:))))]); drawnow
             end
         end
     end
