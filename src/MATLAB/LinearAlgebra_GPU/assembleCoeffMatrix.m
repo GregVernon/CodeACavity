@@ -1,145 +1,80 @@
-function A = assembleCoeffMatrix(NX, NY)
+function A = assembleCoeffMatrix(dx, dy, NX, NY)
 %% Generate A for a domain from 1:N
-StencilTemplate = spalloc(NY-2,NX-2,5);
-sRow = cell(NY-2,NX-2);
-sCol = cell(NY-2,NX-2);
-sVal = cell(NY-2,NX-2);
-% syms C L R B T
-C = -4;%*(dy^2 + dx^2); %-4;
-L = 1; %1;
-R = 1; %1;
-B = 1; %1;
-T = 1; %1;
-nNodes = (NX-2)*(NY-2);
-parfor node = 1:nNodes
-    Stencil = StencilTemplate;
-    [jj,ii] = ind2sub([NY-2,NX-2],node);
+sRow = nan(1, 5 * (NY) * (NX));
+sCol = nan(1, 5 * (NY) * (NX));
+sVal = nan(1, 5 * (NY) * (NX));
+sIdx = 0;
+
+% syms C L R D U
+I = 1;
+C = -2*(dy^2 + dx^2); %-4;
+L = 1 * dy^2; %1;
+R = 1 * dy^2; %1;
+D = 1 * dx^2; %1;
+U = 1 * dx^2; %1;
+nNodes = (NX)*(NY);
+for node = 1:nNodes
+    jj = rem(node-1, NY) + 1;
+    ii = (node - jj)/(NY) + 1;
     if ii == 1 && jj == 1
         % Bottom Left Node
-        % Slower
-        Stencil(jj,ii) = C;     %-4;
-        Stencil(jj,ii+1) = R;   %1;
-        Stencil(jj+1,ii) = T;   %1;
-        
-        % Faster
-        %             srow = [jj jj jj+1];
-        %             scol = [ii ii+1 ii];
-        %             sval = [C R T];
-        %             Stencil = sparse(srow,scol,sval);
-    elseif ii == NX-2 && jj == 1
+        sIdx = sIdx(end) + 1;
+        sRow(sIdx) = node;
+        sCol(sIdx) = jj + (ii - 1).*(NY);
+        sVal(sIdx) = I;
+    elseif ii == NX && jj == 1
         % Bottom Right Node
-        % Slower
-        Stencil(jj,ii) = C;     %-4;
-        Stencil(jj,ii-1) = L;   %1;
-        Stencil(jj+1,ii) = T;   %1;
-        
-        % Faster
-        %             srow = [jj jj jj+1];
-        %             scol = [ii ii-1 ii];
-        %             sval = [C L T];
-        %             Stencil = sparse(srow,scol,sval);
-    elseif ii == 1 && jj == NY-2
+        sIdx = sIdx(end) + 1;
+        sRow(sIdx) = node;
+        sCol(sIdx) = jj + (ii - 1).*(NY);
+        sVal(sIdx) = I;
+    elseif ii == 1 && jj == NY
         % Top Left Node
-        % Slower
-        Stencil(jj,ii) = C;     %-4;
-        Stencil(jj-1,ii) = B;   %1;
-        Stencil(jj,ii+1) = R;   %1;
-        
-        % Faster
-        %             srow = [jj jj-1 jj];
-        %             scol = [ii ii ii+1];
-        %             sval = [C B R];
-        %             Stencil = sparse(srow,scol,sval);
-    elseif ii == NX-2 && jj == NY-2
+        sIdx = sIdx(end) + 1;
+        sRow(sIdx) = node;
+        sCol(sIdx) = jj + (ii - 1).*(NY);
+        sVal(sIdx) = I;
+    elseif ii == NX && jj == NY
         % Top Right Node
-        % Slower
-        Stencil(jj,ii) = C;     %-4;
-        Stencil(jj,ii-1) = L;   %1;
-        Stencil(jj-1,ii) = B;   %1;
-        
-        % Faster
-        %             srow = [jj jj jj-1];
-        %             scol = [ii ii-1 ii];
-        %             sval = [C L B];
-        %             Stencil = sparse(srow,scol,sval);
+        sIdx = sIdx(end) + 1;
+        sRow(sIdx) = node;
+        sCol(sIdx) = jj + (ii - 1).*(NY);
+        sVal(sIdx) = I;
     elseif ii == 1
-        %             Left Node
-        % Slower
-        Stencil(jj,ii) = C;     %-4;
-        Stencil(jj,ii+1) = R;   %1;
-        Stencil(jj+1,ii) = T;   %1;
-        Stencil(jj-1,ii) = B;   %1;
-        
-        % Faster
-        %             srow = [jj jj jj+1 jj-1];
-        %             scol = [ii ii+1 ii ii];
-        %             sval = [C R T B];
-        %             Stencil = sparse(srow,scol,sval);
-    elseif ii == NX-2
+        % Left Node
+        sIdx = sIdx(end) + 1;
+        sRow(sIdx) = node;
+        sCol(sIdx) = jj + (ii - 1).*(NY);
+        sVal(sIdx) = I;
+    elseif ii == NX
         % Right Node
-        % Slower
-        Stencil(jj,ii) = C;     %-4;
-        Stencil(jj,ii-1) = L;   %1;
-        Stencil(jj+1,ii) = T;   %1;
-        Stencil(jj-1,ii) = B;   %1;
-        
-        % Faster
-        %             srow = [jj jj jj+1 jj-1];
-        %             scol = [ii ii-1 ii ii];
-        %             sval = [C L T B];
-        %             Stencil = sparse(srow,scol,sval);
+        sIdx = sIdx(end) + 1;
+        sRow(sIdx) = node;
+        sCol(sIdx) = jj + (ii - 1).*(NY);
+        sVal(sIdx) = I;
     elseif jj == 1
         % Bottom Node
-        % Slower
-        Stencil(jj,ii) = C;     %-4;
-        Stencil(jj+1,ii) = T;   %1;
-        Stencil(jj,ii-1) = L;   %1;
-        Stencil(jj,ii+1) = R;   %1;
-        
-        % Faster
-        %             srow = [jj jj+1 jj jj];
-        %             scol = [ii ii ii-1 ii+1];
-        %             sval = [C T L R];
-        %             Stencil = sparse(srow,scol,sval);
-    elseif jj == NY-2
+        sIdx = sIdx(end) + 1;
+        sRow(sIdx) = node;
+        sCol(sIdx) = jj + (ii - 1).*(NY);
+        sVal(sIdx) = I;
+    elseif jj == NY
         % Top Node
-        % Slower
-        Stencil(jj,ii) = C;     %-4;
-        Stencil(jj-1,ii) = B;   %1;
-        Stencil(jj,ii+1) = R;   %1;
-        Stencil(jj,ii-1) = L;   %1;
-        
-        % Faster
-        %             srow = [jj jj-1 jj jj];
-        %             scol = [ii ii ii+1 ii-1];
-        %             sval = [C B R L];
-        %             Stencil = sparse(srow,scol,sval);
+        sIdx = sIdx(end) + 1;
+        sRow(sIdx) = node;
+        sCol(sIdx) = jj + (ii - 1).*(NY);
+        sVal(sIdx) = I;
     else
         % Interior Node
-        %Slower
-        Stencil(jj,ii) = C;     %-4;
-        Stencil(jj,ii+1) = R;   %1;
-        Stencil(jj,ii-1) = L;   %1;
-        Stencil(jj+1,ii) = T;   %1;
-        Stencil(jj-1,ii) = B;   %1;
-        
-        %Faster
-        %             srow = [jj jj jj jj+1 jj-1];
-        %             scol = [ii ii+1 ii-1 ii ii];
-        %             sval = [C R L T B];
-        %             Stencil = sparse(srow,scol,sval);
+        sIdx = [sIdx(end) + 1 : sIdx(end) + 5];
+        sRow(sIdx) = [node node node node node];
+        sCol(sIdx) = [jj jj jj jj+1 jj-1] + ([ii ii+1 ii-1 ii ii] - 1).*(NY); 
+        sVal(sIdx) = [C R L U D];
     end
-    %flipud(Stencil);  % Just for viz purposes
-    [indx] = find(Stencil);
-    val = Stencil(indx);
-    
-    sRow{node} = ones(length(val),1)*node;
-    sCol{node} = indx;
-    sVal{node} = val;
 end
 
-sRow = cell2mat(reshape(sRow,(NX-2)*(NY-2),1));
-sCol = cell2mat(reshape(sCol,(NX-2)*(NY-2),1));
-sVal = cell2mat(reshape(sVal,(NX-2)*(NY-2),1));
-A = gpuArray(sparse(sRow,sCol,sVal));
+sRow(isnan(sRow)) = [];
+sCol(isnan(sCol)) = [];
+sVal(isnan(sVal)) = [];
+A = gpuArray(sparse(sRow,sCol,sVal,(NY)*(NX),(NY)*(NX)));
 % spy(A)
