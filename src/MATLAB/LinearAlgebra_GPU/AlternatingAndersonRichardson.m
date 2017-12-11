@@ -14,8 +14,8 @@ aFreq = 25;
 aCount = 0;
 nHist = 20;
 mCount = 0;
-X = zeros(size(x,1),nHist+1);
-F = zeros(size(x,1),nHist+1);
+X = zeros(size(x,1),nHist+1,'gpuArray');
+F = zeros(size(x,1),nHist+1,'gpuArray');
 
 iter = 0;
 err = inf;
