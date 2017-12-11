@@ -36,7 +36,11 @@ elseif any(ismember(fixedPointMethods,method))
     A = FDM;
     clearvars FDM
     FDM.A = A;
-    FDM.D = gpuArray(speye(size(gather(A))) .* gather(A));
+    dVal = spdiags(A,0);
+    I = speye(size(A));
+    [iRow,iCol] = find(I);
+    D = sparse(iCol,iRow,dVal,size(A,1),size(A,2));
+    FDM.D = D;
     FDM.R = triu(A,1) + tril(A,-1);
     FDM.iD = gpuArray(inv(gather(FDM.D)));
 end
