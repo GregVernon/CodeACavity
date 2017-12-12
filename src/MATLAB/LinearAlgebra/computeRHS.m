@@ -57,8 +57,3 @@ II = reshape(repmat(2:NX-1,NY-2,1),(NY-2)*(NX-2),1);
 % bidx = sub2ind([NY,NX],JJ,II);
 bidx = JJ + (II - 1).*(NY);
 b(bidx) = -(dx^2*dy^2 * OMEGA(bidx));
-%% Remove Boundary Nodes from RHS vector
-% jj = [[1:NY] [1:NY] [1*ones(1,NX)] [NY*ones(1,NX)]];
-% ii = [[1*ones(1,NY)] [NX*ones(1,NY)] [1:NX] [1:NX]];
-% bidx = sub2ind([NY,NX],jj,ii);
-% b(bidx) = [];
