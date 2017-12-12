@@ -23,7 +23,7 @@ while err > tol
     iter = iter+1;
     aCount = aCount + 1;
     if aCount < aFreq
-        if aFreq - (aCount+1) <= nHist
+        if (aFreq - (aCount+1)) <= nHist
             mCount = mCount+1;
             X(:,mCount) = x;
             F(:,mCount) = f;
@@ -33,7 +33,7 @@ while err > tol
         f = iD*(b - A*x);
         x = x + B*f;
         
-        if aFreq - (aCount+1) <= nHist
+        if (aFreq - (aCount+1)) <= nHist
             X(:,mCount) = x - X(:,mCount);
             F(:,mCount) = f - F(:,mCount);
         end
@@ -49,5 +49,5 @@ while err > tol
     res = b - A*x;
     err = norm(res);
 end
-disp(iter)
+% disp(iter)
 warning ('on','all')
