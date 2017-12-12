@@ -29,17 +29,19 @@ cREYNOLDS = zeros(NY,NX);
 
 FDM = assembleCoeffMatrix(dx, dy, NX,NY);
 
+fixedPointMethods = {'Jacobi','Weighted Jacobi','Mapped Jacobi','Richardson','Mapped Richardson','AlternatingAndersonRichardson'};
 if strcmpi(method,'Decomposition')
     FDM = decomposition(FDM);
-elseif strcmpi(method,'Jacobi')
+elseif any(ismember(fixedPointMethods,method))
     A = FDM;
     clearvars FDM
     FDM.A = A;
-    FDM.D = speye(size(A)) .* spdiags(A,0);
+    FDM.D = diag(diag(A));
     FDM.R = triu(A,1) + tril(A,-1);
     FDM.iD = inv(FDM.D);
 end
 
+initPlot = true;
 tic;
 t=0.0;
 pIter = 0;
@@ -60,13 +62,40 @@ while t < tmax && tstep < max_tstep% start the time integration
     % Increment time value by timestep
     t=t+dt;
     %% plot
-    if pIter == 1e1
+    if pIter == 1e2
         pIter = 0;
         disp(['Time: ' num2str(t)])
         if plotFlow == true
-            subplot(131), contourf(xx,yy,OMEGA), axis('square'); colormap(jet), caxis([-max(abs(OMEGA(:))) max(abs(OMEGA(:)))]); colorbar% plot vorticity
-            subplot(132), contourf(xx,yy,PSI), axis('square'); colormap(jet), caxis([-max(abs(PSI(:))) max(abs(PSI(:)))]);colorbar% streamfunction
-            subplot(133), quiver(xx,yy,U,V), axis('square'); drawnow % streamfunction
+            if initPlot == true
+                initPlot = false;
+                figure;
+                subplot(131);
+                [~,pltOMEGA]=contourf(xx,yy,OMEGA); 
+                axis('square'); 
+                colormap(jet);
+                caxis([-max(abs(OMEGA(:))) max(abs(OMEGA(:)))]); 
+                colorbar('southoutside')% plot vorticity
+                
+                subplot(132);
+                [~,pltPSI]=contourf(xx,yy,PSI); 
+                axis('square'); 
+                colormap(jet);
+                caxis([-max(abs(PSI(:))) max(abs(PSI(:)))]);
+                colorbar('southoutside')% streamfunction
+                
+                subplot(133);
+                hold on
+                pltVEL=quiver(xx,yy,U,V); 
+                [~,conVEL]=contour(xx,yy,VELOCITY);
+                axis('square'); 
+                axis([xmin xmax ymin ymax]);
+                colorbar('southoutside')
+                drawnow % streamfunction
+            else
+                pltOMEGA.ZData=OMEGA;
+                pltPSI.ZData=PSI;
+                pltVEL.UData=U; pltVEL.VData=V; conVEL.ZData=VELOCITY; drawnow
+            end
         end
     end
 end

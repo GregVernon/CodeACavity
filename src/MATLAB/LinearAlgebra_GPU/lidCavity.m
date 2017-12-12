@@ -1,51 +1,102 @@
-function lidCavity(N, tmax, tol, plotFlow)
+function lidCavity(N, tmax, method, tol, max_tstep, plotFlow)
 
 NY = N;
 NX = N;
-jj = ((2:NY-1)');
-ii = ((2:NX-1));
-h=1.0/(NY-1);
+
+xmin = 0;
+xmax = 1;
+x = gpuArray(linspace(xmin,xmax,NX));
+ymin = 0;
+ymax = 1;
+y = gpuArray(linspace(ymin,ymax,NY));
+[xx,yy] = meshgrid(x,y);
+
+dx=x(2)-x(1);
+dy=y(2)-y(1);
 
 Visc=.01;
 
-dt_max = tmax / 1000;
+dt_max = (tmax / 10000);
 
-PSI = zeros(NY,NX,'gpuArray');
-OMEGA = zeros(NY,NX,'gpuArray');
-OMEGA(jj,[NX-1 NX])= -2.0/h;
-U = zeros(NY,NX,'gpuArray');
-V = zeros(NY,NX,'gpuArray');
+PSI=zeros(NY,NX,'gpuArray');
+OMEGA=zeros(NY,NX,'gpuArray');
+OMEGA([NY NY-1],2:NX-1)= -2.0/dy;
 
+U = zeros(NY,NX);
+V = zeros(NY,NX);
 VELOCITY = zeros(NY,NX,'gpuArray');
 cREYNOLDS = zeros(NY,NX,'gpuArray');
 
+FDM = assembleCoeffMatrix(gather(dx), gather(dy), NX,NY);
 
-FDM = assembleCoeffMatrix(NX,NY);
-method = 'cg';
+fixedPointMethods = {'Jacobi','Weighted Jacobi','Mapped Jacobi','Richardson','Mapped Richardson','AlternatingAndersonRichardson'};
+if strcmpi(method,'Decomposition')
+    FDM = decomposition(FDM);
+elseif any(ismember(fixedPointMethods,method))
+    A = FDM;
+    clearvars FDM
+    FDM.A = A;
+    FDM.D = gpuArray(diag(diag(gather(A))));
+    FDM.R = triu(A,1) + tril(A,-1);
+    FDM.iD = gpuArray(inv(gather(FDM.D)));
+end
+
+initPlot = true;
+tic;
 t=0.0;
 pIter = 0;
-while t < tmax % start the time integration
+tstep = 0;
+while t < tmax && tstep < max_tstep% start the time integration
     pIter = pIter+1;
+    tstep = tstep + 1;
     % Compute timestep
-    dt = delta_t(VELOCITY, cREYNOLDS, dt_max, h);
+    dt = delta_t(VELOCITY, cREYNOLDS, dt_max, dx,dy);
     % Compute streamfunction
-    PSI = computePSI(PSI, OMEGA, FDM, method,tol, h, NY, NX);
+    PSI = computePSI(PSI, OMEGA, FDM, method,tol, dx, dy, NX, NY);
     % Apply vorticity boundary conditions
-    OMEGA = applyBC_OMEGA(PSI, OMEGA, h, NY, NX);
-    % Compute vorticity
-    OMEGA(jj,ii) = arrayfun(@computeOMEGA,PSI(jj+1,ii),PSI(jj-1,ii),PSI(jj,ii+1),PSI(jj,ii-1), OMEGA(jj+1,ii), OMEGA(jj-1,ii), OMEGA(jj,ii+1), OMEGA(jj,ii-1), OMEGA(jj,ii), dt, h, Visc);
+    OMEGA = applyBC_OMEGA(PSI, OMEGA, dx, dy, NX, NY);
     % Compute Velocity
-    [U(jj,ii), V(jj,ii), VELOCITY(jj,ii), cREYNOLDS(jj,ii)] = arrayfun(@computeVELOCITY,PSI(jj+1,ii),PSI(jj-1,ii),PSI(jj,ii+1),PSI(jj,ii-1), h);
+    [U, V, VELOCITY, cREYNOLDS] = computeVELOCITY(PSI, dx, dy, NX, NY);
+    % Compute vorticity
+    OMEGA = computeOMEGA(PSI, OMEGA, U, V, dt, dx, dy, NX, NY, Visc);
     % Increment time value by timestep
     t=t+dt;
     %% plot
-    if pIter == 1e2
+    if pIter == -1e2
         pIter = 0;
         disp(['Time: ' num2str(t)])
         if plotFlow == true
-            subplot(131), contourf(rot90(fliplr(OMEGA))), axis('square'); colorbar% plot vorticity
-            subplot(132), contourf(rot90(fliplr(PSI))), axis('square'); colorbar% streamfunction
-            subplot(133), quiver(rot90(fliplr(U)),rot90(fliplr(V))), axis('square');axis([1 N 1 N]); drawnow % streamfunction
+            if initPlot == true
+                initPlot = false;
+                figure;
+                subplot(131);
+                [~,pltOMEGA]=contourf(xx,yy,OMEGA); 
+                axis('square'); 
+                colormap(jet);
+                caxis([-gather(max(abs(OMEGA(:)))) gather(max(abs(OMEGA(:))))]); 
+                colorbar('southoutside')% plot vorticity
+                
+                subplot(132);
+                [~,pltPSI]=contourf(xx,yy,PSI); 
+                axis('square'); 
+                colormap(jet);
+                caxis([-gather(max(abs(PSI(:)))) gather(max(abs(PSI(:))))]);
+                colorbar('southoutside')% streamfunction
+                
+                subplot(133);
+                hold on
+                pltVEL=quiver(xx,yy,U,V); 
+                [~,conVEL]=contour(xx,yy,VELOCITY);
+                axis('square'); 
+                axis([xmin xmax ymin ymax]);
+                caxis([-gather(max(abs(VELOCITY(:)))) gather(max(abs(VELOCITY(:))))]);
+                colorbar('southoutside')
+                drawnow % streamfunction
+            else
+                pltOMEGA.ZData=gather(OMEGA); caxis([-gather(max(abs(OMEGA(:)))) gather(max(abs(OMEGA(:))))]); 
+                pltPSI.ZData=gather(PSI); caxis([-gather(max(abs(PSI(:)))) gather(max(abs(PSI(:))))]);
+                pltVEL.UData=gather(U); pltVEL.VData=gather(V); conVEL.ZData=gather(VELOCITY); caxis([-gather(max(abs(VELOCITY(:)))) gather(max(abs(VELOCITY(:))))]); drawnow
+            end
         end
     end
 end

@@ -8,10 +8,9 @@ function [x] = conjgrad(A, b, x, tol)
         alpha = rsold / (p' * Ap);
         x = x + alpha * p;
         r = r - alpha * Ap;
-        rsnew = r' * r;
-        res = sqrt(rsnew);
+        res = r' * r;
         
-        p = r + (rsnew / rsold) * p;
-        rsold = rsnew;
+        p = r + (res / rsold) * p;
+        rsold = res;
     end
 end
