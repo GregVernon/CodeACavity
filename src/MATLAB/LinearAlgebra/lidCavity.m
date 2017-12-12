@@ -36,8 +36,7 @@ elseif any(ismember(fixedPointMethods,method))
     A = FDM;
     clearvars FDM
     FDM.A = A;
-    D = diag(diag(A));
-    FDM.D = D;
+    FDM.D = diag(diag(A));
     FDM.R = triu(A,1) + tril(A,-1);
     FDM.iD = inv(FDM.D);
 end

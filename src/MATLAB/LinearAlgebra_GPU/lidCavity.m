@@ -36,8 +36,7 @@ elseif any(ismember(fixedPointMethods,method))
     A = FDM;
     clearvars FDM
     FDM.A = A;
-    D = gpuArray(diag(diag(gather(A))));
-    FDM.D = D;
+    FDM.D = gpuArray(diag(diag(gather(A))));
     FDM.R = triu(A,1) + tril(A,-1);
     FDM.iD = gpuArray(inv(gather(FDM.D)));
 end
