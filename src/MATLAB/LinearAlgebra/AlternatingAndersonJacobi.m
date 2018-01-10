@@ -1,4 +1,4 @@
-function x = AlternatingAndersonRichardson(FDM, b, tol, x0)
+function x = AlternatingAndersonJacobi(FDM, b, tol, x0)
 warning ('off','all')
 weight = 2/3;
 beta = 0.2;
@@ -7,7 +7,6 @@ x = x0;
 A = FDM.A;
 D = FDM.D; %speye(size(FDM)) .* spdiags(FDM,0);
 iD = FDM.iD;
-M = FDM.M;
 I = speye(size(A));
 
 
@@ -29,9 +28,9 @@ while err > tol
             X(:,mCount) = x;
             F(:,mCount) = f;
         end
-        % Richardson iteration
+        % Jacobi iteration
         B = weight*I;
-        f = M.L \ (M.U \ (M.P*(b - A*x)));
+        f = iD*(b - A*x);
         x = x + B*f;
         
         if (aFreq - (aCount+1)) <= nHist
@@ -44,7 +43,7 @@ while err > tol
 %         B = beta*I - (X + beta*F)*inv(F'*F)*F';
 %         B = beta*I - (X + beta*F)*pinv(F'*F)*F';
         B = beta*I - (X + beta*F)/(F'*F)*F';
-        f = M.L \ (M.U \ (M.P*(b - A*x)));
+        f = iD*(b - A*x);
         x = x + B*f;    
     end
     

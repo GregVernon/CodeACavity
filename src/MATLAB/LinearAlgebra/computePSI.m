@@ -22,6 +22,8 @@ elseif strcmpi(method,'Richardson')
     x = richardson(FDM,b,tol,x0);
 elseif strcmpi(method,'Mapped Richardson')
     x = richardson_Mapped(FDM,b,tol,x0,dx,dy,NX,NY);
+elseif strcmpi(method,'AlternatingAndersonJacobi')
+    x = AlternatingAndersonJacobi(FDM,b,tol,x0);
 elseif strcmpi(method,'AlternatingAndersonRichardson')
     x = AlternatingAndersonRichardson(FDM,b,tol,x0);
 end

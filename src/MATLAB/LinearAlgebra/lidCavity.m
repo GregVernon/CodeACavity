@@ -29,7 +29,7 @@ cREYNOLDS = zeros(NY,NX);
 
 FDM = assembleCoeffMatrix(dx, dy, NX,NY);
 
-fixedPointMethods = {'Jacobi','Weighted Jacobi','Mapped Jacobi','Richardson','Mapped Richardson','AlternatingAndersonRichardson'};
+fixedPointMethods = {'Jacobi','Weighted Jacobi','Mapped Jacobi','Richardson','Mapped Richardson','AlternatingAndersonRichardson','AlternatingAndersonJacobi'};
 if strcmpi(method,'Decomposition')
     FDM = decomposition(FDM);
 elseif any(ismember(fixedPointMethods,method))
@@ -39,6 +39,10 @@ elseif any(ismember(fixedPointMethods,method))
     FDM.D = diag(diag(A));
     FDM.R = triu(A,1) + tril(A,-1);
     FDM.iD = inv(FDM.D);
+    [L,U,P] = ilu(A);
+    FDM.M.L = L;
+    FDM.M.U = U;
+    FDM.M.P = P;
 end
 
 initPlot = true;
