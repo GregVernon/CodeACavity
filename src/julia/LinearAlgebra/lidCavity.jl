@@ -1,8 +1,10 @@
 module lidCavity
 import IterativeSolvers
 import SparseArrays
+import Plots
 
 export main
+export plotFlow
 export compute_Δt
 export compute_Ψ
 export compute_Ω
@@ -11,7 +13,7 @@ export applyBC_Ω
 export assembleCoeffMatrix
 export assembleRHS
 
-function main(N,tmax,method,tol,max_tstep)
+function main(N,tmax,method,tol,max_tstep,doPlot)
     NX = N;
     xmin = 0.;
     xmax = 1.;
@@ -38,10 +40,14 @@ function main(N,tmax,method,tol,max_tstep)
 
     FDM = assembleCoeffMatrix(Δx,Δy,NX,NY);
 
+    plotData = [];
     t = 0.;
+    pIter = 100;
+    pCount = 0;
     tstep = 0;
     while t < tmax && tstep < max_tstep # start the time integration
-        tstep = tstep + 1;
+        pCount += 1;
+        tstep += 1;
         # Compute timestep
         Δt = compute_Δt(VELOCITY, cREYNOLDS, Δt_max, Δx, Δy);
         # Compute streamfunction
@@ -53,8 +59,30 @@ function main(N,tmax,method,tol,max_tstep)
         # Compute vorticity
         Ω = compute_Ω(Ψ, Ω, U, V, Δt, Δx, Δy, NX, NY, Visc);
         # Increment time value by timestep
-        t=t+Δt;
+        t += Δt;
+        # Plot
+        if doPlot == true
+            if pCount == pIter || tstep == 1
+                pCount = 0;
+                println("Time: ", t)
+                plt = plotFlow(Ψ, Ω, U, V, VELOCITY, cREYNOLDS, x, y, plotData);
+            end
+        end
     end
+
+    return Ψ,Ω,U,V
+end
+
+function plotFlow(Ψ, Ω, U, V, VELOCITY, cREYNOLDS, x, y, plt)
+    if isempty(plt) == true
+        # Initialize plots
+        Plots.pyplot(); # Set PyPlot as backend
+        plt = Plots.heatmap(Plots.heatmap(Ψ), Plots.heatmap(Ω), Plots.heatmap(VELOCITY))
+        Plots.gui(plt)
+    else
+        Plots.heatmap!(plt,Ψ,Ω,VELOCITY)
+    end
+    return plt
 end
 
 function compute_Δt(VELOCITY, cREYNOLDS, Δt_max, Δx, Δy);
