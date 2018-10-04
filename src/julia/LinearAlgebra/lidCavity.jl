@@ -63,8 +63,7 @@ function compute_Δt(VELOCITY, cREYNOLDS, Δt_max, Δx, Δy);
 
     Δt1 = (Δx*Δy) / (4*vMax);
     Δt2 = (2*vMax) / crMax;
-
-    Δt = minimum([Δt1 Δt2 Δt_max]);
+    Δt = minimum(filter(x->isfinite(x),[Δt1 Δt2 Δt_max]));
 
     return Δt
 end
