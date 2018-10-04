@@ -76,7 +76,7 @@ function compute_Ψ(Ψ, Ω, FDM, method, tol, Δx, Δy, NX, NY);
     elseif lowercase(method) == "cg"
         IterativeSolvers.cg!(x,FDM,b;tol=tol);
     end
-    Ψ = reshape(transpose(x),NY,NX);
+    Ψ = collect(reshape(transpose(x),NY,NX));
     return Ψ
 end
 
