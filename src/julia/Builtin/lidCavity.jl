@@ -100,16 +100,18 @@ function compute_Δt(VELOCITY, cREYNOLDS, Δt_max, Δx, Δy, NX, NY);
 end
 
 function compute_Ψ(Ψ, Ω, tol, Δx, Δy, NX, NY);
-    err = Inf;
+    err = 2*tol;
+    ΔΨ = zeros(Float64,NY,NX);
     while err > tol
         err = 0;
         Ψ0 = Ψ;
         for ii=2:NX-1
             for jj=2:NY-1
                 Ψ[jj,ii]=0.25*(Ψ[jj+1,ii]+Ψ[jj-1,ii]+Ψ[jj,ii+1]+Ψ[jj,ii-1]+Δx*Δy*Ω[jj,ii]);
-                err += abs(Ψ0[jj,ii] - Ψ[jj,ii]) / (NX*NY);
+                ΔΨ[jj,ii] = abs(Ψ0[jj,ii] - Ψ[jj,ii]);
             end
         end
+        err = sum(ΔΨ) / (NY*NX);
     end
     return Ψ
 end
