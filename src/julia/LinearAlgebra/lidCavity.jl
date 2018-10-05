@@ -235,42 +235,10 @@ function assembleRHS(Ψ,Ω,NX,NY,Δx,Δy)
     for node = 1:nNodes
         jj = rem(node-1, NY) + 1;
         ii = Int64((node - jj)/NY) + 1;
-        ## Bottom Left Node
-        if jj == 1 && ii == 1
-            bidx = jj + (ii - 1)*(NY);
-            b[bidx] = 0;
-        ## Bottom Right Node
-        elseif jj == 1 && ii == NX
-            bidx = jj + (ii - 1)*(NY);
-            b[bidx] = 0;
-        ## Top Left Node
-        elseif jj == NY && ii == 1
-            bidx = jj + (ii - 1)*(NY);
-            b[bidx] = 0;
-        ## Top Right Node
-        elseif jj == NY && ii == NX
-            bidx = jj + (ii - 1)*(NY);
-            b[bidx] = 0;
-        ## Left Node
-        elseif jj == 1:NY && ii == 1
-            bidx = jj + (ii - 1)*(NY);
-            b[bidx] = 0;
-        ## Right Node
-        elseif jj == 1:NY && ii == NX
-            bidx = jj + (ii - 1)*(NY);
-            b[bidx] = 0;
-        ## Bottom Node
-        elseif jj == 1 && ii == 1:NX
-            bidx = jj + (ii - 1)*(NY);
-            b[bidx] = 0;
-        ## Top Node
-        elseif jj == NY && ii == 1:NX
-            bidx = jj + (ii - 1)*(NY);
-            b[bidx] = 0;
-        ## Interior Node
-        else
-            bidx = jj + (ii - 1)*(NY);
-            b[bidx] = -(Δx^2*Δy^2 * Ω[bidx]);
+        bidx = jj + (ii - 1)*(NY);
+        ## Check to see if node is an interior Node
+        if ii≠1 && ii≠NY && jj≠1 && jj≠NY
+            b[bidx] = -(Δx^2.0 * Δy^2.0 * Ω[bidx]);
         end
     end
     return b
