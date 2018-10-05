@@ -112,7 +112,7 @@ function compute_Ω(Ψ, Ω, U, V, Δt, Δx, Δy, NX, NY, Visc);
     Ω0 = Ω;
     for ii = 2:NX-1
         for jj = 2:NY-1
-            Ω[jj,ii] = Ω0[jj,ii] + Δt * (-(U[jj,ii] * ((Ω0[jj,ii+1] - Ω0[jj,ii-1]) / (2*Δx))) + -(V[jj,ii] * ((Ω0[jj+1,ii] - Ω0[jj-1,ii]) / (2*Δy))) + Visc*(((Ω0[jj,ii-1] - 2*Ω0[jj,ii] + Ω0[jj,ii+1])/(Δx^2.)) + ((Ω0[jj-1,ii] - 2*Ω0[jj,ii] + Ω0[jj+1,ii])/(Δy^2.))));
+            Ω[jj,ii] = Ω0[jj,ii] + Δt * (-(U[jj,ii] * ((Ω0[jj,ii+1] - Ω0[jj,ii-1]) / (2.0*Δx))) + -(V[jj,ii] * ((Ω0[jj+1,ii] - Ω0[jj-1,ii]) / (2.0*Δy))) + Visc*(((Ω0[jj,ii-1] - 2.0*Ω0[jj,ii] + Ω0[jj,ii+1])/(Δx^2.)) + ((Ω0[jj-1,ii] - 2.0*Ω0[jj,ii] + Ω0[jj+1,ii])/(Δy^2.))));
         end
     end
     return Ω
@@ -126,8 +126,8 @@ function compute_VELOCITY(Ψ, Δx, Δy, NX, NY);
 
     for ii = 2:NX-1
         for jj = 2:NY-1
-            U[jj,ii] =  (Ψ[jj+1,ii] - Ψ[jj-1,ii]) / (2*Δy);
-            V[jj,ii] = -(Ψ[jj,ii+1] - Ψ[jj,ii-1]) / (2*Δx);
+            U[jj,ii] =  (Ψ[jj+1,ii] - Ψ[jj-1,ii]) / (2.0*Δy);
+            V[jj,ii] = -(Ψ[jj,ii+1] - Ψ[jj,ii-1]) / (2.0*Δx);
             VELOCITY[jj,ii] = sqrt(U[jj,ii]^2. + V[jj,ii]^2.);
             cREYNOLDS[jj,ii] = abs(U[jj,ii]) + abs(V[jj,ii]);
         end
@@ -137,12 +137,12 @@ end
 
 function applyBC_Ω(Ψ, Ω, Δx, Δy, NX, NY);
     for ii = 2:NX-1;
-        Ω[1,ii] = -2.0*Ψ[2,ii]/(Δy^2); # vorticity on bottom wall
+        Ω[1,ii] = -2.0*Ψ[2,ii]/(Δy^2.); # vorticity on bottom wall
         Ω[NY,ii]= -2.0*Ψ[NY-1,ii]/(Δy^2) - 2.0/Δy; # vorticity on top wall
     end
     for jj = 2:NY-1;
-        Ω[jj,1] = -2.0*Ψ[jj,2]/(Δx^2);    # vorticity on left wall
-        Ω[jj,NX]= -2.0*Ψ[jj,NX-1]/(Δx^2); # vorticity on right wall
+        Ω[jj,1] = -2.0*Ψ[jj,2]/(Δx^2.);    # vorticity on left wall
+        Ω[jj,NX]= -2.0*Ψ[jj,NX-1]/(Δx^2.); # vorticity on right wall
     end
     return Ω
 end
@@ -233,7 +233,7 @@ function assembleRHS(Ψ,Ω,NX,NY,Δx,Δy)
     nNodes = NX * NY;
     b = zeros(Float64,nNodes,1);
     for node = 1:nNodes
-        jj = rem(node-1, NY) + 1;
+        jj = Int64(rem(node-1, NY)) + 1;
         ii = Int64((node - jj)/NY) + 1;
         bidx = jj + (ii - 1)*(NY);
         ## Check to see if node is an interior Node
