@@ -163,8 +163,8 @@ function assembleCoeffMatrix(dx,dy,NX,NY)
 
     nNodes = (NX)*(NY);
     for node = 1:nNodes
-        jj = rem(node-1, NY) + 1;
-        ii = (node - jj)/(NY) + 1;
+        jj = Int64(rem(node-1, NY)) + 1;
+        ii = Int64((node - jj)/(NY)) + 1;
         if ii == 1 && jj == 1
             # Bottom Left Node
             sIdx = sIdx[end] + 1;

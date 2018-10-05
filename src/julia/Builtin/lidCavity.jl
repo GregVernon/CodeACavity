@@ -143,12 +143,12 @@ end
 
 function applyBC_Ω(Ψ, Ω, Δx, Δy, NX, NY);
     for ii = 2:NX-1;
-        Ω[1,ii] = -2.0*Ψ[2,ii]/(Δy*Δy); # vorticity on bottom wall
-        Ω[NY,ii]= -2.0*Ψ[NY-1,ii]/(Δy*Δy) - 2.0/Δy; # vorticity on top wall
+        Ω[1,ii] = -2.0*Ψ[2,ii]/(Δy^2.); # vorticity on bottom wall
+        Ω[NY,ii]= -2.0*Ψ[NY-1,ii]/(Δy^2.) - 2.0/Δy; # vorticity on top wall
     end
     for jj = 2:NY-1;
-        Ω[jj,1] = -2.0*Ψ[jj,2]/(Δx*Δx);    # vorticity on left wall
-        Ω[jj,NX]= -2.0*Ψ[jj,NX-1]/(Δx*Δx); # vorticity on right wall
+        Ω[jj,1] = -2.0*Ψ[jj,2]/(Δx^2.);    # vorticity on left wall
+        Ω[jj,NX]= -2.0*Ψ[jj,NX-1]/(Δx^2.); # vorticity on right wall
     end
     return Ω
 end
