@@ -110,7 +110,7 @@ end
 
 function compute_Ω(Ψ, Ω, U, V, Δt, Δx, Δy, NX, NY, Visc);
     Ω0 = Ω;
-    for ii = 2:NX-1
+    Threads.@threads for ii = 2:NX-1
         for jj = 2:NY-1
             Ω[jj,ii] = Ω0[jj,ii] + Δt * (-(U[jj,ii] * ((Ω0[jj,ii+1] - Ω0[jj,ii-1]) / (2.0*Δx))) + -(V[jj,ii] * ((Ω0[jj+1,ii] - Ω0[jj-1,ii]) / (2.0*Δy))) + Visc*(((Ω0[jj,ii-1] - 2.0*Ω0[jj,ii] + Ω0[jj,ii+1])/(Δx^2.)) + ((Ω0[jj-1,ii] - 2.0*Ω0[jj,ii] + Ω0[jj+1,ii])/(Δy^2.))));
         end
@@ -124,7 +124,7 @@ function compute_VELOCITY(Ψ, Δx, Δy, NX, NY);
     VELOCITY = zeros(Float64,NY,NX);
     cREYNOLDS = zeros(Float64,NY,NX);
 
-    for ii = 2:NX-1
+    Threads.@threads for ii = 2:NX-1
         for jj = 2:NY-1
             U[jj,ii] =  (Ψ[jj+1,ii] - Ψ[jj-1,ii]) / (2.0*Δy);
             V[jj,ii] = -(Ψ[jj,ii+1] - Ψ[jj,ii-1]) / (2.0*Δx);
@@ -232,7 +232,7 @@ function assembleRHS(Ψ,Ω,NX,NY,Δx,Δy)
     ## Generate b for a domain from 2:N-1
     nNodes = NX * NY;
     b = zeros(Float64,nNodes,1);
-    for node = 1:nNodes
+    Threads.@threads for node = 1:nNodes
         jj = Int64(rem(node-1, NY)) + 1;
         ii = Int64((node - jj)/NY) + 1;
         bidx = jj + (ii - 1)*(NY);
