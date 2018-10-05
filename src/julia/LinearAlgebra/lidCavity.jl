@@ -98,13 +98,16 @@ end
 
 function compute_Ψ(Ψ, Ω, FDM, method, tol, Δx, Δy, NX, NY);
     b = assembleRHS(Ψ,Ω,NX,NY,Δx,Δy);
-    x = reshape(Ψ,NX*NY,1);
     if lowercase(method) == "direct"
-        x = FDM \ b;
+        Ψ = FDM \ b;
+        Ψ = reshape(Ψ,NY,NX);
     elseif lowercase(method) == "cg"
         IterativeSolvers.cg!(x,FDM,b;tol=tol);
+        Ψ = reshape(Ψ,NX*NY,1);
+        IterativeSolvers.cg!(Ψ,FDM,b;tol=tol);
+        Ψ = reshape(Ψ,NY,NX);
     end
-    Ψ = collect(reshape(transpose(x),NY,NX));
+    # Ψ = collect(reshape(transpose(x),NY,NX));
     return Ψ
 end
 
